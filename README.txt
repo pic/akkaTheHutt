@@ -1,3 +1,0 @@
-akkaTheHutt
-
-akka exposed.
