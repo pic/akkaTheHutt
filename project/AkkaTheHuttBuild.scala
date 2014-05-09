@@ -10,7 +10,9 @@ object AkkaTheHuttBuild extends Build {
       name := "akkaTheHutt",
       organization := "org.superfluo",
       version := "0.0.1",
-      scalaVersion := "2.10.3",
+      
+      scalaVersion := "2.11.0",
+      crossScalaVersions  := Seq("2.11.0", "2.10.3"),
 
       scalacOptions += "-feature",
       scalacOptions += "-deprecation",
