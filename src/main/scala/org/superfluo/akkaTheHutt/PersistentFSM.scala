@@ -16,20 +16,27 @@ class PersistentFSM extends Processor with LoggingFSM[String, List[String]] {
 
   val rand = new scala.util.Random
 
+  var counter = 0
+
   when("doingSomething") {
     case Event(Persistent(Done(newData), _), _) => goto("waiting").using(newData)
   }
 
   when("waiting", stateTimeout = 1.second) {
-    case Event(StateTimeout, _) => {
+    case Event(StateTimeout, _) if !recoveryRunning => {
+      self ! Persistent(StateTimeout)
+      stay
+    }
+    case Event(Persistent(StateTimeout, _), _) => {
       println(stateData)
       goto("doingSomething")
     }
   }
 
   onTransition {
-    case _ -> "doingSomething" => {
-      self ! Persistent(Done(rand.nextString(5) :: stateData))
+    case _ -> "doingSomething" if !recoveryRunning => {
+      self ! Persistent(Done(s"${counter}-${rand.nextInt(1000)}" :: stateData))
+      counter += 1
     }
   }
 
